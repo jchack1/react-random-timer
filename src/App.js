@@ -1,6 +1,7 @@
 import "./App.css";
 import React, {useState} from "react";
 import ShowRemainingTime from "./components/ShowRemainingTime";
+import styled from "styled-components";
 
 function App() {
   const [minimumTime, updateMinimumTime] = useState(12);
@@ -51,7 +52,7 @@ function App() {
   };
 
   return (
-    <div className="App">
+    <div className="app-background">
       <h1>random timer</h1>
       <p>will go off between</p>
 
