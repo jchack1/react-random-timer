@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 
-const ShowRemainingTime = ({timestampEnd, stopCounting, timeComplete}) => {
+const ShowRemainingTime = ({timestampEnd, stopCounting}) => {
   const [remainingTime, updateRemainingTime] = useState("");
 
   useEffect(() => {
@@ -14,10 +14,6 @@ const ShowRemainingTime = ({timestampEnd, stopCounting, timeComplete}) => {
       const minutes = String(newDate.getMinutes());
       const seconds = String(newDate.getSeconds());
 
-      //   updateRemainingTime(
-      //     `${newDate.getMinutes()}:${newDate.getSeconds()}`
-      //   );
-
       updateRemainingTime(`${minutes}:${seconds.padStart(2, "0")}`);
     }, 1000);
 
@@ -25,8 +21,6 @@ const ShowRemainingTime = ({timestampEnd, stopCounting, timeComplete}) => {
       clearInterval(intervalId);
     };
   }, [stopCounting]);
-
-  console.log(`stopCounting: ${stopCounting}`);
 
   return (
     <div>

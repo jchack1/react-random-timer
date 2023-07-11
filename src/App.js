@@ -12,6 +12,18 @@ const FlexContainer = styled.div`
   justify-content: center;
 `;
 
+const Title = styled.h1`
+  margin: 0;
+  font-family: "Press Start 2P", monospace;
+  font-size: 3rem;
+  text-align: center;
+  text-shadow: 2px 6px rgb(152, 85, 148);
+
+  @media (max-width: 400px) {
+    font-size: 2.5rem;
+  }
+`;
+
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -78,15 +90,20 @@ function App() {
   const [timeEnd, updateTimeEnd] = useState(0);
   const [showRemaining, updateShowRemaining] = useState(false);
   const [stopCounting, updateStopCounting] = useState(false);
+  const [setTimeoutId, updateSetTimeoutId] = useState(null);
 
   const [playSound] = useSound(alarmSound);
 
   const handleBeginTimer = (min, max) => {
     updateTimeComplete(false);
-
     updateStopCounting(false);
 
-    if (typeof min !== "number" || typeof max !== "number") {
+    if (
+      isNaN(min) ||
+      isNaN(max) ||
+      typeof min !== "number" ||
+      typeof max !== "number"
+    ) {
       updateValidationError("input must be a number");
       setTimeout(() => {
         updateValidationError("");
@@ -102,26 +119,25 @@ function App() {
       return;
     }
 
-    //do math to get the random time, save to variable
+    //do math to get the random time
     const randomTimeMilliSeconds =
-      // Math.floor(Math.random() * (max - min + 1) + min) * 1000; //seconds
       Math.floor(Math.random() * (max - min + 1) + min) * 1000 * 60; //minutes
-
-    console.log(`randomTimeMilliSeconds: ${randomTimeMilliSeconds}`);
 
     //save timeEnd
     const timerEndsAt = Date.now() + randomTimeMilliSeconds;
-    console.log(`timerEndsAt: ${timerEndsAt}`);
     updateTimeEnd(timerEndsAt);
 
     //setTimeout
-    setTimeout(() => {
+    const id = setTimeout(() => {
       updateTimeComplete(true);
       updateTimeEnd(0);
       updateStopCounting(true);
       updateShowRemaining(false);
       playSound();
     }, randomTimeMilliSeconds);
+
+    //update timeout id so we can clear later on reset
+    updateSetTimeoutId(id);
   };
 
   const handleReset = () => {
@@ -129,14 +145,18 @@ function App() {
     updateShowRemaining(false);
     updateTimeComplete(false);
     updateTimeEnd(0);
+    clearTimeout(setTimeoutId);
+    updateSetTimeoutId(null);
   };
 
   return (
     <div className="app-background">
-      <h1>random timer</h1>
+      <Title>random timer</Title>
       <p>will go off between</p>
 
       <FlexContainer>
+        {/* time inputs */}
+
         <InputContainer>
           <Input
             value={minimumTime}
@@ -149,7 +169,10 @@ function App() {
           />
           minutes
         </InputContainer>
+
         <FlexContainer>
+          {/* buttons, which change depending on different conditions */}
+
           <ButtonContainer>
             {timeEnd === 0 && (
               <Button
@@ -165,7 +188,7 @@ function App() {
                 onClick={() => updateShowRemaining(!showRemaining)}
                 backgroundColor="#ffc414"
               >
-                show remaining time?
+                {showRemaining ? "hide remaining time" : "show remaining time"}
               </Button>
             )}
 
@@ -176,14 +199,16 @@ function App() {
             )}
           </ButtonContainer>
 
-          {validationError.length > 0 && <p>{validationError}</p>}
+          {validationError.length > 0 && (
+            <div style={{textAlign: "center"}}>{validationError}</div>
+          )}
 
           {timeComplete && <div style={{textAlign: "center"}}>done!</div>}
 
+          {/* show spinner if timer running but not showing remaining time */}
           {timeEnd > 0 && !showRemaining && (
-            // {timeEnd === 0 && (
             <div className="spinner">
-              <i class="fa fa-spinner" aria-hidden="true"></i>
+              <i className="fa fa-spinner" aria-hidden="true"></i>
             </div>
           )}
 
@@ -191,7 +216,6 @@ function App() {
             <ShowRemainingTime
               timestampEnd={timeEnd}
               stopCounting={stopCounting}
-              timeComplete={timeComplete}
             />
           )}
         </FlexContainer>
