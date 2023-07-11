@@ -30,7 +30,7 @@ const ShowRemainingTime = ({timestampEnd, stopCounting, timeComplete}) => {
 
   return (
     <div>
-      <p>{remainingTime}</p>
+      <p style={{textAlign: "center"}}>{remainingTime}</p>
     </div>
   );
 };
